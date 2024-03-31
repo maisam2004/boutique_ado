@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -37,6 +37,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'django.contrib.sites',
+
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
 ]
 
 MIDDLEWARE = [
@@ -59,13 +65,44 @@ TEMPLATES = [
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
-                'django.template.context_processors.request',
+                'django.template.context_processors.request',#rquired by all auth
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
         },
     },
 ]
+
+AUTHENTICATION_BACKENDS = [
+    
+    # Needed to login by username in Django admin, regardless of `allauth`
+    'django.contrib.auth.backends.ModelBackend',
+
+    # `allauth` specific authentication methods, such as login by email
+    'allauth.account.auth_backends.AuthenticationBackend',
+    
+]
+
+SITE_ID= 1
+
+
+#Since by default allauth will send confirmation emails to any new accounts.
+#We need to temporarily log those emails to the console so we can get the confirmation links
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+ACCOUNT_AUTHENTICATION_METHOD = 'username_email'#The account authentication method is what tells allauth that we want to allow
+
+ACCOUNT_EMAIL_REQUIRED = True #authentication using either usernames or emails.
+
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'#Verifying your email is mandatory so we know users are using a real email.
+ACCOUNT_SIGNUP_EMAIL_ENTER_TWICE = True #And they're gonna be required to enter their email twice on the registration page
+ACCOUNT_USERNAME_MIN_LENGTH = 4  #Finally we're setting a minimum username length of four characters.
+
+LOGIN_URL = '/accounts/login/' #And specifying a login url and a url to redirect back to after logging in.
+LOGIN_REDIRECT_URL = '/' # I'm gonna change the login redirect url to /success
+
+
+
+
 
 WSGI_APPLICATION = 'boutique_ado.wsgi.application'
 
